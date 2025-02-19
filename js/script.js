@@ -37,8 +37,7 @@ if (typedElement) {
 
 // Function to fetch Medium blogs
 async function fetchMediumBlogs() {
-  const mediumFeedUrl =
-    "https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@adharvkt";
+  const mediumFeedUrl = `https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@adharvkt&rand=${Math.random()}`;
 
   try {
     const response = await fetch(mediumFeedUrl);
@@ -55,17 +54,25 @@ async function fetchMediumBlogs() {
   }
 }
 
-// Function to display blogs
+// Function to display blogs with filtering
 function displayBlogs(posts) {
   blogContainer.innerHTML = ""; // Clear previous content
 
+  // Set the word to be excluded (case-insensitive)
+  const excludedWord = "Hfjcjc";
+
   posts.forEach((post) => {
-    const blogCard = document.createElement("div");
-    blogCard.classList.add("box"); // Flash card styling like services section
+    // Skip this post if the title contains the excluded word
+    if (post.title.toLowerCase().includes(excludedWord.toLowerCase())) {
+      return;
+    }
 
     // Extract image from content
     const imageMatch = post.content.match(/<img[^>]+src="([^">]+)"/);
     const imageUrl = imageMatch ? imageMatch[1] : "";
+
+    const blogCard = document.createElement("div");
+    blogCard.classList.add("box"); // Flash card styling like services section
 
     blogCard.innerHTML = `
       <i class="fas fa-newspaper"></i>
@@ -76,9 +83,7 @@ function displayBlogs(posts) {
       }
       <h3>${post.title}</h3>
       <p>${post.content.replace(/(<([^>]+)>)/gi, "").substring(0, 300)}...</p>
-      <a href="${
-        post.link
-      }" class="btn">Read More</a> <!-- Added Read More button -->
+      <a href="${post.link}" class="btn">Read More</a>
     `;
 
     blogContainer.appendChild(blogCard);
@@ -97,32 +102,3 @@ window.onload = () => {
 };
 
 console.log("JavaScript loaded successfully.");
-// Function to display blogs
-function displayBlogs(posts) {
-  blogContainer.innerHTML = ""; // Clear previous content
-
-  posts.forEach((post) => {
-    const blogCard = document.createElement("div");
-    blogCard.classList.add("box"); // Flash card styling like services section
-
-    // Extract image from content
-    const imageMatch = post.content.match(/<img[^>]+src="([^">]+)"/);
-    const imageUrl = imageMatch ? imageMatch[1] : "";
-
-    blogCard.innerHTML = `
-      <i class="fas fa-newspaper"></i>
-      ${
-        imageUrl
-          ? `<img src="${imageUrl}" alt="${post.title}" style="width: 100%; border-radius: 0.5rem; margin-bottom: 1rem;">`
-          : ""
-      }
-      <h3>${post.title}</h3>
-      <p>${post.content.replace(/(<([^>]+)>)/gi, "").substring(0, 300)}...</p>
-      <a href="${
-        post.link
-      }" class="btn">Read More</a> <!-- Added Read More button -->
-    `;
-
-    blogContainer.appendChild(blogCard);
-  });
-}
