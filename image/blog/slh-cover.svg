@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Scattered LAPSUS$ Hunters threat actor profile">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#04140a"/>
+      <stop offset="0.55" stop-color="#05202a"/>
+      <stop offset="1" stop-color="#0a0a1a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#2cd626" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#2cd626" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="acc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2cd626"/>
+      <stop offset="1" stop-color="#19e3c5"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#2cd626" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+    <filter id="blur"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="900" cy="300" r="320" fill="url(#glow)"/>
+  <!-- alliance triangle -->
+  <g stroke="url(#acc)" stroke-width="2.5" stroke-opacity="0.8" fill="none">
+    <path d="M900 130 L1040 400 L760 400 Z"/>
+    <path d="M900 130 L900 292 M1040 400 L900 292 M760 400 L900 292" stroke-opacity="0.35" stroke-dasharray="6 8"/>
+  </g>
+  <g filter="url(#blur)" opacity="0.8">
+    <circle cx="900" cy="130" r="26" fill="#2cd626"/>
+    <circle cx="1040" cy="400" r="26" fill="#19e3c5"/>
+    <circle cx="760" cy="400" r="26" fill="#2cd626"/>
+  </g>
+  <g>
+    <circle cx="900" cy="130" r="22" fill="#04140a" stroke="#2cd626" stroke-width="3"/>
+    <circle cx="1040" cy="400" r="22" fill="#04140a" stroke="#19e3c5" stroke-width="3"/>
+    <circle cx="760" cy="400" r="22" fill="#04140a" stroke="#2cd626" stroke-width="3"/>
+    <circle cx="900" cy="292" r="10" fill="#19e3c5"/>
+  </g>
+  <g font-family="Poppins, Arial, sans-serif" font-size="20" fill="#cfeedd" text-anchor="middle">
+    <text x="900" y="92">Scattered Spider</text>
+    <text x="1040" y="450">ShinyHunters</text>
+    <text x="760" y="450">LAPSUS$</text>
+  </g>
+  <!-- title -->
+  <g font-family="Poppins, Arial, sans-serif">
+    <text x="70" y="108" font-size="22" letter-spacing="6" fill="#19e3c5">FALCONFEEDS RESEARCH</text>
+    <text x="70" y="220" font-size="76" font-weight="700" fill="#ffffff">Scattered</text>
+    <text x="70" y="305" font-size="76" font-weight="700" fill="#ffffff">LAPSUS$</text>
+    <text x="70" y="390" font-size="76" font-weight="700" fill="url(#acc)">Hunters</text>
+    <text x="70" y="450" font-size="26" fill="#9fd6b4">Profiling the evolving cybercrime ecosystem</text>
+  </g>
+  <rect x="70" y="500" width="200" height="6" rx="3" fill="url(#acc)"/>
+  <text x="70" y="560" font-family="Poppins, Arial, sans-serif" font-size="22" fill="#6fae86">Threat Actor Profile  |  Adharv K T</text>
+</svg>
